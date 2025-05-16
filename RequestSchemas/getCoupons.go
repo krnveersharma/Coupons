@@ -13,7 +13,8 @@ type RequestCoupons struct {
 }
 
 type CouponsResult struct {
-	CouponCode    string  `json:"coupon_code"`
-	DiscountValue float64 `json:"discount_value"`
-	DiscountType  string  `json:"discount_type"`
+	CouponCode    string   `json:"coupon_code"`
+	DiscountValue float64  `json:"discount_value"`
+	DiscountType  string   `json:"discount_type"`
+	Categories    []string `json:"categories"`
 }

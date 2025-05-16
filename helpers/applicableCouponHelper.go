@@ -3,10 +3,12 @@ package helpers
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	requestschemas "github.com/farmako/RequestSchemas"
+	"github.com/farmako/cache"
 	dboperations "github.com/farmako/dbOperations"
 	"gorm.io/gorm"
 )
@@ -30,7 +32,8 @@ func GetApplicableCategories(cartItems []requestschemas.ProductInfo) []string {
 func GetPrice(ids []string, db *gorm.DB) (uint, error) {
 	var totalPrice uint
 	for i := range ids {
-		price, err := dboperations.GetPrice(ids[i], db)
+
+		price, err := GetProductPrice(ids[i], db)
 		if err != nil {
 			return 0, err
 		}
@@ -39,6 +42,27 @@ func GetPrice(ids []string, db *gorm.DB) (uint, error) {
 
 	fmt.Printf("total price is: %v", totalPrice)
 	return totalPrice, nil
+}
+
+func GetProductPrice(id string, db *gorm.DB) (uint, error) {
+	priceStr, err := cache.Get(id)
+	if err == nil && priceStr != "" {
+		priceUint64, err := strconv.ParseUint(priceStr, 10, 32)
+		if err == nil {
+			return uint(priceUint64), nil
+		}
+	}
+
+	price, err := dboperations.GetPrice(id, db)
+	if err != nil {
+		return 0, err
+	}
+
+	err = cache.Set(id, strconv.FormatUint(uint64(price), 10))
+	if err != nil {
+		fmt.Printf("unable to set reis key: %v", err)
+	}
+	return price, nil
 }
 
 func IsWithinValidTimeWindow(ts time.Time, validTimeWindow string) (bool, error) {

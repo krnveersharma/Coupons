@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/farmako/cache"
 	"github.com/farmako/config"
 	"github.com/farmako/controllers"
 	"github.com/farmako/models"
@@ -34,7 +35,9 @@ func StartServer(config config.AppConfig) {
 
 	db.AutoMigrate(&models.Coupon{})
 	db.AutoMigrate(&models.Product{})
+
 	setUpRoutes(app, db)
+	cache.SetupRedis(config.RedisAddress, config.RedisPassword, 3600*time.Second)
 
 	app.Run(fmt.Sprintf(":%v", config.ServerPort))
 }

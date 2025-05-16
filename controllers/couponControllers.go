@@ -53,6 +53,7 @@ func (c *ControllerSetup) GetApplicableCoupons(ctx *gin.Context) {
 				CouponCode:    coupons[i].CouponCode,
 				DiscountValue: coupons[i].DiscountValue,
 				DiscountType:  string(coupons[i].DiscountType),
+				Categories:    coupons[i].ApplicableCategories,
 			})
 		}
 	}
