@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type UsageType string
@@ -18,16 +20,15 @@ const (
 )
 
 type Coupon struct {
-	ID                    uint         `json:"id" gorm:"primaryKey;autoIncrement"`
-	CouponCode            string       `json:"coupon_code" gorm:"unique;not null"`
-	ExpiryDate            time.Time    `json:"expiry_date"`
-	UsageType             UsageType    `json:"usage_type"`
-	ApplicableMedicineIDs []uint       `json:"applicable_medicine_ids" gorm:"-"`
-	ApplicableCategories  []string     `json:"applicable_categories" gorm:"-"`
-	MinOrderValue         float64      `json:"min_order_value"`
-	ValidTimeWindow       string       `json:"valid_time_window"`
-	TermsAndConditions    string       `json:"terms_and_conditions"`
-	DiscountType          DiscountType `json:"discount_type"`
-	DiscountValue         float64      `json:"discount_value"`
-	MaxUsagePerUser       int          `json:"max_usage_per_user"`
+	CouponCode            string         `json:"coupon_code" gorm:"primaryKey"`
+	ExpiryDate            time.Time      `json:"expiry_date"`
+	UsageType             UsageType      `json:"usage_type"`
+	ApplicableMedicineIDs pq.StringArray `json:"applicable_medicine_ids" gorm:"type:text[]"`
+	ApplicableCategories  pq.StringArray `json:"applicable_categories" gorm:"type:text[]"`
+	MinOrderValue         float64        `json:"min_order_value"`
+	ValidTimeWindow       string         `json:"valid_time_window"`
+	TermsAndConditions    string         `json:"terms_and_conditions"`
+	DiscountType          DiscountType   `json:"discount_type"`
+	DiscountValue         float64        `json:"discount_value"`
+	MaxUsagePerUser       int            `json:"max_usage_per_user"`
 }
