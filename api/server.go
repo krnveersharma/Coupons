@@ -33,6 +33,7 @@ func StartServer(config config.AppConfig) {
 	}))
 
 	db.AutoMigrate(&models.Coupon{})
+	db.AutoMigrate(&models.Product{})
 	setUpRoutes(app, db)
 
 	app.Run(fmt.Sprintf(":%v", config.ServerPort))
@@ -41,4 +42,5 @@ func StartServer(config config.AppConfig) {
 func setUpRoutes(app *gin.Engine, db *gorm.DB) {
 	setupController := controllers.SetupController(db)
 	app.POST("/coupons/applicable", setupController.GetApplicableCoupons)
+	app.POST("/coupons/validate", setupController.ValidateCoupon)
 }

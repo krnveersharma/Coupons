@@ -8,6 +8,7 @@ import (
 
 type UsageType string
 type DiscountType string
+type DiscountTarget string
 
 const (
 	UsageTypeOneTime   UsageType = "one_time"
@@ -17,6 +18,11 @@ const (
 const (
 	DiscountPercentage DiscountType = "percentage"
 	DiscountFlat       DiscountType = "flat"
+)
+
+const (
+	DiscountInventory DiscountTarget = "inventory"
+	DiscountCharges   DiscountTarget = "charges"
 )
 
 type Coupon struct {
@@ -31,4 +37,5 @@ type Coupon struct {
 	DiscountType          DiscountType   `json:"discount_type"`
 	DiscountValue         float64        `json:"discount_value"`
 	MaxUsagePerUser       int            `json:"max_usage_per_user"`
+	DiscountTarget        DiscountTarget `json:"discount_target"`
 }

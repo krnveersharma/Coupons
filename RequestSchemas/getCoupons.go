@@ -8,9 +8,8 @@ type ProductInfo struct {
 }
 
 type RequestCoupons struct {
-	CartItems  []ProductInfo `json:"cart_items"`
-	OrderTotal uint          `json:"order_total"`
-	TimeStamp  time.Time     `json:"timestamp"`
+	CartItems []ProductInfo `json:"cart_items"`
+	TimeStamp time.Time     `json:"timestamp"`
 }
 
 type CouponsResult struct {
