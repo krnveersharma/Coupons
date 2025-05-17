@@ -64,7 +64,8 @@ func (c *ControllerSetup) GetApplicableCoupons(ctx *gin.Context) {
 	ids := helpers.GetApplicableIds(requestData.CartItems)
 	categories := helpers.GetApplicableCategories(requestData.CartItems)
 
-	totalPrice, err := helpers.GetPrice(ids, c.DB)
+	idsAndQuantity := helpers.GetApplicableIdsFromValidate(requestData.CartItems)
+	totalPrice, err := helpers.GetPrice(idsAndQuantity, c.DB)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
@@ -122,7 +123,8 @@ func (c *ControllerSetup) ValidateCoupon(ctx *gin.Context) {
 		return
 	}
 
-	ids := helpers.GetApplicableIds(requestData.CartItems)
+	ids := helpers.GetApplicableIdsFromValidate(requestData.CartItems)
+	categories := helpers.GetApplicableCategoriessFromValidate(requestData.CartItems)
 	totalPrice, err := helpers.GetPrice(ids, c.DB)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -143,7 +145,7 @@ func (c *ControllerSetup) ValidateCoupon(ctx *gin.Context) {
 		return
 	}
 
-	itemsDiscount, chargesDiscount := helpers.GetDiscountedPrice(coupon, totalPrice)
+	itemsDiscount, chargesDiscount := helpers.GetDiscountedPrice(coupon, totalPrice, ids, categories)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"is_valid": true,

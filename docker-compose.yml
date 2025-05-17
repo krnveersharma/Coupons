@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DSN=host=postgres user=postgres password=postgrespassword dbname=farmakodb port=5432 sslmode=disable
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespassword
+      - POSTGRES_DB=farmakodb
+      - REDIS_ADDR=redis:6379
+      - REDIS_ADDRESS=redis:6379
+      - HTTP_PORT=8080
+
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: farmakodb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:

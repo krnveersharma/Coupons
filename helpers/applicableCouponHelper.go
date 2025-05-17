@@ -13,7 +13,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetApplicableIds(cartItems []requestschemas.ProductInfo) []string {
+type IdAndPrice struct {
+	Id       string
+	Quantity uint
+}
+
+type CategoryAndPrice struct {
+	Category string
+	Quantity uint
+}
+
+func GetApplicableIds(cartItems []requestschemas.CartItem) []string {
 	var ids []string
 	for i := 0; i < len(cartItems); i++ {
 		ids = append(ids, cartItems[i].ID)
@@ -21,7 +31,23 @@ func GetApplicableIds(cartItems []requestschemas.ProductInfo) []string {
 	return ids
 }
 
-func GetApplicableCategories(cartItems []requestschemas.ProductInfo) []string {
+func GetApplicableIdsFromValidate(cartItems []requestschemas.CartItem) []IdAndPrice {
+	var ids []IdAndPrice
+	for i := 0; i < len(cartItems); i++ {
+		ids = append(ids, IdAndPrice{Id: cartItems[i].ID, Quantity: cartItems[i].Quantity})
+	}
+	return ids
+}
+
+func GetApplicableCategoriessFromValidate(cartItems []requestschemas.CartItem) []CategoryAndPrice {
+	var categories []CategoryAndPrice
+	for i := 0; i < len(cartItems); i++ {
+		categories = append(categories, CategoryAndPrice{Category: cartItems[i].Category, Quantity: cartItems[i].Quantity})
+	}
+	return categories
+}
+
+func GetApplicableCategories(cartItems []requestschemas.CartItem) []string {
 	var categories []string
 	for i := 0; i < len(cartItems); i++ {
 		categories = append(categories, cartItems[i].Category)
@@ -29,7 +55,7 @@ func GetApplicableCategories(cartItems []requestschemas.ProductInfo) []string {
 	return categories
 }
 
-func GetPrice(ids []string, db *gorm.DB) (uint, error) {
+func GetPricePerProduct(ids []string, db *gorm.DB) (uint, error) {
 	var totalPrice uint
 	for i := range ids {
 
@@ -38,6 +64,21 @@ func GetPrice(ids []string, db *gorm.DB) (uint, error) {
 			return 0, err
 		}
 		totalPrice += price
+	}
+
+	fmt.Printf("total price is: %v", totalPrice)
+	return totalPrice, nil
+}
+
+func GetPrice(ids []IdAndPrice, db *gorm.DB) (uint, error) {
+	var totalPrice uint
+	for i := range ids {
+
+		price, err := GetProductPrice(ids[i].Id, db)
+		if err != nil {
+			return 0, err
+		}
+		totalPrice += price * ids[i].Quantity
 	}
 
 	fmt.Printf("total price is: %v", totalPrice)

@@ -82,6 +82,15 @@ definitions:
     - UsageTypeOneTime
     - UsageTypeMultiUse
     - UsageTypeTimeBased
+  requestschemas.CartItem:
+    properties:
+      category:
+        type: string
+      id:
+        type: string
+      quantity:
+        type: integer
+    type: object
   requestschemas.CouponsResult:
     properties:
       categories:
@@ -95,18 +104,11 @@ definitions:
       discount_value:
         type: number
     type: object
-  requestschemas.ProductInfo:
-    properties:
-      category:
-        type: string
-      id:
-        type: string
-    type: object
   requestschemas.RequestCoupons:
     properties:
       cart_items:
         items:
-          $ref: '#/definitions/requestschemas.ProductInfo'
+          $ref: '#/definitions/requestschemas.CartItem'
         type: array
       timestamp:
         type: string
@@ -115,7 +117,7 @@ definitions:
     properties:
       cart_items:
         items:
-          $ref: '#/definitions/requestschemas.ProductInfo'
+          $ref: '#/definitions/requestschemas.CartItem'
         type: array
       coupon_code:
         type: string

@@ -8,8 +8,8 @@ type ProductInfo struct {
 }
 
 type RequestCoupons struct {
-	CartItems []ProductInfo `json:"cart_items"`
-	TimeStamp time.Time     `json:"timestamp"`
+	CartItems []CartItem `json:"cart_items"`
+	TimeStamp time.Time  `json:"timestamp"`
 }
 
 type CouponsResult struct {

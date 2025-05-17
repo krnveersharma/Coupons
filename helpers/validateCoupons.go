@@ -28,15 +28,33 @@ func IsCouponValid(requestData requestschemas.ValidaTeCouponData, coupon models.
 	return nil
 }
 
-func GetDiscountedPrice(coupon models.Coupon, price uint) (uint, uint) {
+func GetDiscountedPrice(coupon models.Coupon, price uint, ids []IdAndPrice, categories []CategoryAndPrice) (uint, uint) {
+	if coupon.ApplicableCategories[0] == "All" {
+		if coupon.DiscountTarget == "charges" {
+			return 0, uint(coupon.DiscountValue)
+		}
+		if coupon.DiscountType == "percentage" {
+			return price * uint(coupon.DiscountValue) / 100, 0
+		}
+		return uint(coupon.DiscountValue), 0
+	}
 
-	if coupon.DiscountTarget == "charges" {
-		return 0, uint(coupon.DiscountValue)
+	var itemsDiscount, chargesDiscount uint
+
+	for i := range len(ids) {
+		if contains(coupon.ApplicableMedicineIDs, ids[i].Id) || contains(coupon.ApplicableCategories, categories[i].Category) {
+			if coupon.DiscountTarget == "charges" {
+				chargesDiscount += uint(coupon.DiscountValue)
+			}
+			if coupon.DiscountType == "percentage" {
+				itemsDiscount += price * uint(coupon.DiscountValue) / 100
+			} else {
+				itemsDiscount += uint(coupon.DiscountValue)
+			}
+		}
 	}
-	if coupon.DiscountType == "percentage" {
-		return price * uint(coupon.DiscountValue) / 100, 0
-	}
-	return uint(coupon.DiscountValue), 0
+
+	return itemsDiscount, chargesDiscount
 }
 
 func contains(slice []string, item string) bool {

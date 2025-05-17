@@ -363,6 +363,20 @@ const docTemplate = `{
                 "UsageTypeTimeBased"
             ]
         },
+        "requestschemas.CartItem": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
         "requestschemas.CouponsResult": {
             "type": "object",
             "properties": {
@@ -383,24 +397,13 @@ const docTemplate = `{
                 }
             }
         },
-        "requestschemas.ProductInfo": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
         "requestschemas.RequestCoupons": {
             "type": "object",
             "properties": {
                 "cart_items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/requestschemas.ProductInfo"
+                        "$ref": "#/definitions/requestschemas.CartItem"
                     }
                 },
                 "timestamp": {
@@ -414,7 +417,7 @@ const docTemplate = `{
                 "cart_items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/requestschemas.ProductInfo"
+                        "$ref": "#/definitions/requestschemas.CartItem"
                     }
                 },
                 "coupon_code": {
