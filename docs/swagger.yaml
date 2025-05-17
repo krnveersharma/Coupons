@@ -1,0 +1,275 @@
+definitions:
+  models.CouponSwagger:
+    properties:
+      applicable_categories:
+        description: Categories the coupon applies to
+        items:
+          type: string
+        type: array
+      applicable_medicine_ids:
+        description: IDs of applicable medicines
+        items:
+          type: string
+        type: array
+      coupon_code:
+        description: Coupon code (must be unique)
+        type: string
+      discount_target:
+        allOf:
+        - $ref: '#/definitions/models.DiscountTarget'
+        description: Discount target (inventory, charges)
+      discount_type:
+        allOf:
+        - $ref: '#/definitions/models.DiscountType'
+        description: Type of discount (percentage, flat)
+      discount_value:
+        description: Value of the discount
+        type: number
+      expiry_date:
+        description: Expiry date of the coupon
+        type: string
+      max_usage_per_user:
+        description: Maximum usage allowed per user
+        type: integer
+      min_order_value:
+        description: Minimum order value required for the coupon
+        type: number
+      terms_and_conditions:
+        description: Terms and conditions of the coupon
+        type: string
+      usage_type:
+        allOf:
+        - $ref: '#/definitions/models.UsageType'
+        description: Usage type of the coupon (one_time, multi_use, time_based)
+      valid_time_window:
+        description: Valid time window for the coupon (e.g. "10:00-18:00")
+        type: string
+    type: object
+  models.DiscountTarget:
+    enum:
+    - inventory
+    - charges
+    type: string
+    x-enum-varnames:
+    - DiscountInventory
+    - DiscountCharges
+  models.DiscountType:
+    enum:
+    - percentage
+    - flat
+    type: string
+    x-enum-varnames:
+    - DiscountPercentage
+    - DiscountFlat
+  models.Product:
+    properties:
+      category:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+    type: object
+  models.UsageType:
+    enum:
+    - one_time
+    - multi_use
+    - time_based
+    type: string
+    x-enum-varnames:
+    - UsageTypeOneTime
+    - UsageTypeMultiUse
+    - UsageTypeTimeBased
+  requestschemas.CouponsResult:
+    properties:
+      categories:
+        items:
+          type: string
+        type: array
+      coupon_code:
+        type: string
+      discount_type:
+        type: string
+      discount_value:
+        type: number
+    type: object
+  requestschemas.ProductInfo:
+    properties:
+      category:
+        type: string
+      id:
+        type: string
+    type: object
+  requestschemas.RequestCoupons:
+    properties:
+      cart_items:
+        items:
+          $ref: '#/definitions/requestschemas.ProductInfo'
+        type: array
+      timestamp:
+        type: string
+    type: object
+  requestschemas.ValidaTeCouponData:
+    properties:
+      cart_items:
+        items:
+          $ref: '#/definitions/requestschemas.ProductInfo'
+        type: array
+      coupon_code:
+        type: string
+      timestamp:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /coupon/add:
+    post:
+      consumes:
+      - application/json
+      description: Adds a coupon to the system
+      parameters:
+      - description: Coupon data
+        in: body
+        name: coupon
+        required: true
+        schema:
+          $ref: '#/definitions/models.CouponSwagger'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a new coupon
+      tags:
+      - Coupon
+  /coupon/applicable:
+    post:
+      consumes:
+      - application/json
+      description: Returns applicable coupons based on cart data
+      parameters:
+      - description: Request data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestschemas.RequestCoupons'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/requestschemas.CouponsResult'
+              type: array
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get applicable coupons
+      tags:
+      - coupons
+  /coupon/validate:
+    post:
+      consumes:
+      - application/json
+      description: Validates coupon for cart and returns applicable discounts
+      parameters:
+      - description: Validation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestschemas.ValidaTeCouponData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Validate a coupon
+      tags:
+      - coupons
+  /products:
+    get:
+      description: Fetch all products from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/models.Product'
+              type: array
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Add a product with id, name, category and price
+      parameters:
+      - description: Product Info
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a new product
+      tags:
+      - products
+swagger: "2.0"

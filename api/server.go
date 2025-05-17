@@ -8,9 +8,12 @@ import (
 	"github.com/farmako/cache"
 	"github.com/farmako/config"
 	"github.com/farmako/controllers"
+	_ "github.com/farmako/docs"
 	"github.com/farmako/models"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -44,6 +47,14 @@ func StartServer(config config.AppConfig) {
 
 func setUpRoutes(app *gin.Engine, db *gorm.DB) {
 	setupController := controllers.SetupController(db)
-	app.POST("/coupons/applicable", setupController.GetApplicableCoupons)
-	app.POST("/coupons/validate", setupController.ValidateCoupon)
+
+	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	couponRouter := app.Group("/coupons")
+	couponRouter.POST("/add-coupon", setupController.AddCoupon)
+	couponRouter.POST("/applicable", setupController.GetApplicableCoupons)
+	couponRouter.POST("/validate", setupController.ValidateCoupon)
+
+	productRouter := app.Group("/products")
+	productRouter.GET("/", setupController.GetProducts)
+	productRouter.POST("/add-product", setupController.AddProduct)
 }
